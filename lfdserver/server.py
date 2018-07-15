@@ -31,7 +31,7 @@ def index():
 
 def load_args(json_file):
     with open(json_file) as f:
-        return json.load(f)
+        return list(set([item.lower() for item in json.load(f)]))
 
 
 def check_loaded(loaded_content, json_file):
