@@ -19,6 +19,7 @@ def api_modules():
 
 @app.route('/api/v1/title')
 def api_generate_title():
+    check_loaded()
     return '{} of {}'.format(random.choice(titles).capitalize(), random.choice(nouns).capitalize())
 
 
@@ -30,6 +31,15 @@ def index():
 def load_args(json_file):
     with open(json_file) as f:
         return json.load(f)
+
+
+def check_loaded():
+    # In case main is not used
+    if not titles:
+        titles = load_args("titles.json")
+
+    if not nouns:
+        nouns = load_args("nouns.json")
 
 
 if __name__ == '__main__':
