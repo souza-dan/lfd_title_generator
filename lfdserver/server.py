@@ -7,9 +7,9 @@ import random
 
 log = logging.getLogger(__name__)
 app = Flask(__name__, template_folder="./")
-titles = []
-nouns = []
 
+main_titles = []
+main_nouns = []
 
 # apis
 @app.route('/api/v1/hello')
@@ -19,7 +19,8 @@ def api_modules():
 
 @app.route('/api/v1/title')
 def api_generate_title():
-    check_loaded()
+    titles = check_loaded(main_titles, 'titles.json')
+    nouns = check_loaded(main_nouns, 'nouns.json')
     return '{} of {}'.format(random.choice(titles).capitalize(), random.choice(nouns).capitalize())
 
 
@@ -33,13 +34,11 @@ def load_args(json_file):
         return json.load(f)
 
 
-def check_loaded():
+def check_loaded(loaded_content, json_file):
     # In case main is not used
-    if not titles:
-        titles = load_args("titles.json")
-
-    if not nouns:
-        nouns = load_args("nouns.json")
+    if not loaded_content:
+        return load_args(json_file)
+    return loaded_content
 
 
 if __name__ == '__main__':
@@ -51,6 +50,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    nouns = load_args(args.nouns)
-    titles = load_args(args.titles)
+    main_nouns = load_args(args.nouns)
+    main_titles = load_args(args.titles)
     app.run(host='0.0.0.0')
