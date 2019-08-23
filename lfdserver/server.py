@@ -23,6 +23,16 @@ def api_generate_title():
     nouns = check_loaded(main_nouns, 'nouns.json')
     return '{} of {}'.format(random.choice(titles).capitalize(), random.choice(nouns).capitalize())
 
+@app.route('/api/v1/title2')
+def api_generate_title_2():
+    titles = check_loaded(main_titles, 'titles.json')
+    nouns = check_loaded(main_nouns, 'nouns.json')
+    return '{} of {} and {}'.format(
+        random.choice(titles).capitalize(),
+        random.choice(nouns).capitalize(),
+        random.choice(nouns).capitalize()
+    )
+
 
 @app.route('/')
 def index():
