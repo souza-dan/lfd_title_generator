@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, jsonify
 
 import argparse
 import json
@@ -32,6 +32,19 @@ def api_generate_title_2():
         random.choice(nouns).capitalize(),
         random.choice(nouns).capitalize()
     )
+
+
+@app.route('/api/v1/shuffle', methods=['POST'])
+def shuffle_list():
+    csv = request.form.get('list')
+    separator = request.form.get('separator')
+    if not separator:
+        separator = ","
+    if csv:
+        csv_list = ([x for x in request.form.get('list').split(",")])
+        random.shuffle(csv_list)
+        return jsonify(separator.join(csv_list))
+    return jsonify(["no values"])
 
 
 @app.route('/')
