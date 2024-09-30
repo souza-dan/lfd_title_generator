@@ -29,31 +29,35 @@ def get_model():
 def generate_scenario():
     # Example scenario generation
     return '''
-    Please provide a multiple choice intriguing scenario like the following in this json format 
-    with the keys "text" and "choices" only. "text" is a string and "choices" is a list of strings.
-    Please have at least 3 choices. Please create prompts that will lead to learning about the 
-    responder's personality.
+    Please provide json list of 5 multiple choice intriguing scenario. 
+    Please have at least 3 choices for each scenario. The answer to the prompts 
+    should tell us about the responder's personality.
     Example response:
+    [
     {
-        'text': 'You find a mysterious book in an old library. What do you do?',
-        'choices': ['Read it', 'Ignore it', 'Take it home']
-    }
+        'text': 'You find  your autobiography at the library.',
+        'choices': ['Read it', 'Burn it', 'Take it home']
+    },
+    {
+        'text': 'You buy a lego set with no instructions at a yard sale, but you can see what it 
+        looks like on the box.,
+        'choices': ['Try to build what's on the box', 'Give it to a younger relative', 'Make your 
+        own creation']
+    }    
+    ]
+        Each scenario should have the keys "text" and "choices". "text" is a string and "choices" is a list of strings.
     '''
 
 def extract_json_from_response(response):
-    # Regular expression to find JSON object in the response
-    json_pattern = re.compile(r'\{.*?\}')
-    match = json_pattern.search(response)
-
-    if match:
-        json_str = match.group(0)
-        try:
-            return json.loads(json_str)
-        except json.JSONDecodeError:
-            print("Error decoding JSON")
-            return None
-    else:
-        print("No JSON found in the response")
+    try:
+        start_index = response.index('[')
+        end_index = response.rindex(']') + 1
+        json_str = response[start_index:end_index]
+        # Replace single quotes with double quotes
+        json_str = json_str.replace("'", '"')
+        return json.loads(json_str)
+    except (ValueError, json.JSONDecodeError):
+        print("Error decoding JSON")
         return None
 
 
