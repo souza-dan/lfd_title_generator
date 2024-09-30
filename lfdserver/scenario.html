@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css">
+    <title>Scenario</title>
+</head>
+<body>
+<div class="container">
+    <div class="card-deck mb-3 text-center">
+        <div class="card mb-4 box-shadow">
+            <div class="card-header">
+                <h4 class="my-0 font-weight-normal">Choose Your Scenario</h4>
+            </div>
+            <div class="card-body">
+                <form id="scenarioForm">
+                    <div id="scenarioText">{{ scenario.text }}</div>
+                    <div id="choices">
+                        {% for choice in scenario.choices %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="response" value="{{ choice }}">
+                            <label class="form-check-label">{{ choice }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn-lg btn-block btn-outline-primary">Submit</button>
+                </form>
+                <div id="result"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#scenarioForm').on('submit', function(event){
+            event.preventDefault();
+            $.ajax({
+                url: '/submit_response',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function(data){
+                    $('#result').html('<h2>Your Title: ' + data.title + '</h2>');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
