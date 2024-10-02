@@ -21,7 +21,6 @@
                         <h4 class="my-0 font-weight-normal">{{ scenario.text }}</h4>
                     </div>
                     <div class="card-body">
-
                         <div class="choices">
                             {% for choice in scenario.choices %}
                             <div class="form-check">
@@ -30,6 +29,7 @@
                             </div>
                             {% endfor %}
                         </div>
+                        <input type="hidden" name="scenario_{{ outer_loop.index0 }}" value="{{ scenario.text }}">
                     </div>
                 </div>
             </div>
@@ -45,12 +45,20 @@
         $('#scenariosForm').on('submit', function(event){
             event.preventDefault();
             var form = $(this);
+            var submitButton = form.find('button[type="submit"]');
+            submitButton.prop('disabled', true); // Disable the submit button
+
             $.ajax({
                 url: '/submit_response',
                 method: 'POST',
                 data: form.serialize(),
                 success: function(data){
                     $('.result').html('<h2>Your Title: ' + data.title + '</h2>');
+                    submitButton.prop('disabled', false); // Re-enable the submit button
+                },
+                error: function(xhr, status, error){
+                    $('.result').html('<h2>Error: ' + xhr.responseText + '</h2>');
+                    submitButton.prop('disabled', false); // Re-enable the submit button
                 }
             });
         });

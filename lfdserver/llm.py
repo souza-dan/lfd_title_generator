@@ -46,6 +46,27 @@ def generate_scenario():
         Each scenario should have the keys "text" and "choices". "text" is a string and "choices" is a list of strings.
     '''
 
+
+def evaluate_scenario_prompt(responses):
+    responses_str = json.dumps(responses, indent=4)
+
+    return f'''
+    Your job is to assign a title that matches the user's responses.
+    
+    Only return the title and do not do any other processing.
+    
+    Titles follow the format "<Position> of <A type of food> Here are some examples of titles:
+    The worshipful the mayor of Apple fritters
+    Musical instrument repairer of Kyopolou
+    Lord lieutenant of Eggplant
+    Motorboat service technician of Scotch grouse
+    Information clerk of Cold lamb
+
+    Please evaluate the following responses and return just the title that matches the user's 
+    responses:
+    {responses_str}
+    '''
+
 def extract_json_from_response(response):
     try:
         start_index = response.index('[')

@@ -11,7 +11,8 @@ import time
 import threading
 import queue
 
-from llm import generate_scenario, extract_json_from_response, pull_model, get_model, start_ollama
+from llm import generate_scenario, extract_json_from_response, pull_model, get_model, start_ollama, \
+    evaluate_scenario_prompt
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -76,6 +77,20 @@ def shuffle_list():
 def index():
     return render_template('index.html')
 
+@app.route('/submit_scenarios', methods=['POST'])
+def submit_scenarios():
+    responses = {}
+    for key, value in request.form.items():
+        if key.startswith('response_'):
+            scenario_index = key.split('_')[1]
+            scenario_text = request.form.get(f'scenario_{scenario_index}')
+            responses[scenario_text] = value
+
+    # Process the responses as needed
+    # For example, generate a title based on the responses
+    title = model.generate_title(responses)
+    return jsonify({'title': title})
+
 @app.route('/scenario', methods=['GET'])
 def scenario():
     if not scenario_queue.empty():
@@ -89,11 +104,22 @@ def scenario():
 
 @app.route('/submit_response', methods=['POST'])
 def submit_response():
-    user_response = request.form['response']
-    # Generate a title based on the user's response
-    title = model.generate_title(user_response)
-    return jsonify({'title': title})
+    log.info(f"Submitted form: {request.form}")
+    user_response = {}
+    for key, value in request.form.items():
+        if key.startswith('response_'):
+            scenario_index = key.split('_')[1]
+            scenario_text = request.form.get(f'scenario_{scenario_index}')
+            user_response[scenario_text] = value
 
+    log.info(f"Submitted response: {user_response}")
+
+    # Generate a title based on the user's response
+    response = ollama.generate(model=get_model(), prompt=evaluate_scenario_prompt(user_response))
+
+    log.info(f"Evaluated Response: {response}")
+
+    return jsonify({'title': response['response']})
 
 
 def load_args(json_file):

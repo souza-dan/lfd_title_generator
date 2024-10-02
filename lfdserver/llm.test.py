@@ -2,10 +2,8 @@ import sys
 import os
 import unittest
 import ollama
-from sqlalchemy.event import remove
 
 from llm import generate_scenario, extract_json_from_response, pull_model, start_ollama, get_model
-from server import scenario
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
