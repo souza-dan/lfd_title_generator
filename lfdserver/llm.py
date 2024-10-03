@@ -4,6 +4,7 @@ import subprocess
 import time
 import requests
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ def pull_model():
     ollama.pull(get_model())
 
 def get_model():
-    return 'gemma'
+    return 'gemma:2b'
 
 
 def generate_scenario():
@@ -29,19 +30,24 @@ def generate_scenario():
     return '''
     Please provide json list of 5 multiple choice intriguing scenario. 
     Please have at least 3 choices for each scenario. The answer to the prompts 
-    should tell us about the responder's personality.
-    Example response:
+    should tell us about the responder's personality. The style of the prompt and choices should 
+    mimic the voight kampf test from Blade Runner.
+    Example response in valid json array starting with open square bracket [ and ending with 
+    closed square bracket ]:
     [
     {
-        'text': 'You find  your autobiography at the library.',
-        'choices': ['Read it', 'Burn it', 'Take it home']
+        "text": "You find your autobiography at the library.",
+        "choices": ["Read it", "Burn it", "Take it home"]
     },
     {
-        'text': 'You buy a lego set with no instructions at a yard sale, but you can see what it 
-        looks like on the box.,
-        'choices': ['Try to build what's on the box', 'Give it to a younger relative', 'Make your 
-        own creation']
-    }    
+        "text": "You buy a lego set with no instructions at a yard sale, but you can see what it looks like on the box.",
+        "choices": ["Try to build what's on the box", "Give it to a younger relative", "Make your own creation"]
+    },
+    {
+        "text": "You see a tortoise lying on its back in the desert, its belly baking in the hot 
+        sun, but you’re not helping it. Why not?",
+        "choices": ["I don’t see the point; it’s just a tortoise.", "I feel bad, but I don’t know how to help.", " I would help it immediately; leaving it there feels wrong."]
+    }
     ]
         Each scenario should have the keys "text" and "choices". "text" is a string and "choices" is a list of strings.
     '''
@@ -72,11 +78,9 @@ def extract_json_from_response(response):
         start_index = response.index('[')
         end_index = response.rindex(']') + 1
         json_str = response[start_index:end_index]
-        # Replace single quotes with double quotes
-        json_str = json_str.replace("'", '"')
         return json.loads(json_str)
-    except (ValueError, json.JSONDecodeError):
-        print("Error decoding JSON")
+    except (ValueError, json.JSONDecodeError) as e:
+        print(f"Error decoding JSON: {e}")
         return None
 
 
@@ -98,7 +102,7 @@ class OllamaServiceManager:
             logger.error(f"Error starting Ollama server: {e.stderr}")
             raise
 
-    def ensure_service_is_running(self, retries=5, delay=5):
+    def ensure_service_is_running(self, retries=20, delay=5):
         for attempt in range(retries):
             try:
                 response = requests.get("http://127.0.0.1:11434/api/version")
