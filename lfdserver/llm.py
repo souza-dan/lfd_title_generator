@@ -22,7 +22,7 @@ def pull_model():
     ollama.pull(get_model())
 
 def get_model():
-    return 'gemma:2b'
+    return 'gemma:1b'
 
 
 def generate_scenario():
