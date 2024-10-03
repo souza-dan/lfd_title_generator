@@ -6,6 +6,7 @@ LFD Server is a simple Flask-based web server that generates random titles and s
 
 - [Installation](#installation)
 - [Usage](#usage)
+- [Docker](#docker)
 - [API Endpoints](#api-endpoints)
 - [Configuration](#configuration)
 - [License](#license)
@@ -38,6 +39,20 @@ LFD Server is a simple Flask-based web server that generates random titles and s
     ```
 
 2. The server will start on `http://0.0.0.0:5000`.
+
+
+## Docker
+
+### Build the Docker image
+```sh
+cd lfdserver
+docker build -t lfd_server .
+```
+
+### Run the Docker container
+```sh
+docker run -p 5000:5000 lfd_server
+```
 
 ## API Endpoints
 
