@@ -26,6 +26,7 @@ LFD Server is a simple Flask-based web server that generates random titles and s
 
 3. Install the required dependencies:
     ```sh
+    cd lfdserver
     pip install -r requirements.txt
     ```
 
