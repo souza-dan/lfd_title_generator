@@ -7,17 +7,21 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.2/gh-fork-ribbon.min.css" />
 
     <title>Lasagna Future Day Title Generator</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
         $(document).ready(function(){
-            $("button").click(function(){
-                $("#div1").load("/api/v1/title");
+            $("#driver").click(function(){
+                var button = $(this);
+                button.prop("disabled", true);
+                $("#div1").load("/api/v1/title", function() {
+                    button.prop("disabled", false);
+                });
             });
         });
     </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.2/gh-fork-ribbon.min.css" />
 </head>
 <body>
 <div class="container">
@@ -27,7 +31,9 @@
                 <h4 class="my-0 font-weight-normal">LFD Title Generator</h4>
             </div>
             <div class="card-body">
-                <h1 id="div1" class="card-title pricing-card-title">LFD Title</h1>
+                <div id="div1" class="card-title pricing-card-title">
+                    <h1 class="card-title pricing-card-title">LFD Title</h1>
+                </div>
                 <div id="div2"><h4>Click to assign your fate</h4></div>
                 <button id="driver" type="button" class="btn btn-lg btn-block btn-outline-primary">
                     Receive Your Title

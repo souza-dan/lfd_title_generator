@@ -21,6 +21,7 @@ EXPOSE 5000
 # Define environment variable
 ENV FLASK_APP=server.py
 ENV OLLAMA_MODEL=gemma2:2b
+ENV GEMINI_API_KEY=''
 
 # Run server.py when the container launches
-CMD /bin/sh -c "nohup ollama serve & ollama pull $OLLAMA_MODEL & python server.py"
+CMD /bin/sh -c "nohup ollama serve & python server.py"

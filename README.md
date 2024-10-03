@@ -95,6 +95,10 @@ The server uses two JSON files for generating titles and nouns:
 
 You can specify different files using the `-t` and `-n` command-line arguments when starting the server.
 
+To enable scenario generation, use the -s flag when starting the server. Ensure the OLLAMA_MODEL environment variable is set to the desired model.
+
+To enable gemini role descriptions, set GEMMINI_API_KEY.
+
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.

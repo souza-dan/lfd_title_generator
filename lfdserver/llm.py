@@ -5,6 +5,7 @@ import time
 import requests
 import logging
 import os
+import google.generativeai as genai
 
 logger = logging.getLogger(__name__)
 
@@ -120,3 +121,25 @@ class OllamaServiceManager:
             self.ollama_server_process.terminate()
             self.ollama_server_process.wait()
             logger.info("Ollama server stopped.")
+
+
+def title_responsibilities_prompt(title):
+    return f'''
+    Please provide the roles and responsibilities for the position: "{title}".
+    
+    The position is somewhat absurd, so feel free to be creative and whimsical with the roles 
+    and responsibilities.
+    Please provide the responsibilities HTML content. Use <p>, <ul>, <li>, <h2>, <h3>, <h4>, 
+    <h5>,<strong> tags as needed.
+    '''
+
+def configure_gemini():
+    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+
+def create_gemini_model():
+    return genai.GenerativeModel('gemini-1.5-flash')
+
+def generate_content(model, prompt):
+    response = model.generate_content(prompt)
+    logging.info(f"Generated content: {response}")
+    return response.text

@@ -1,3 +1,5 @@
+import os
+
 import ollama
 from flask import Flask, render_template, request, jsonify
 
@@ -12,7 +14,8 @@ import threading
 import queue
 
 from llm import generate_scenario, extract_json_from_response, pull_model, get_model, start_ollama, \
-    evaluate_scenario_prompt
+    evaluate_scenario_prompt, create_gemini_model, configure_gemini, generate_content, \
+    title_responsibilities_prompt
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -24,6 +27,8 @@ main_nouns = []
 
 # Initialize the queue with a maximum size
 scenario_queue = queue.Queue(maxsize=10)
+
+gemini_model = None
 
 def fill_scenario_queue():
     while True:
@@ -47,7 +52,13 @@ def api_modules():
 def api_generate_title():
     titles = check_loaded(main_titles, 'titles.json')
     nouns = check_loaded(main_nouns, 'nouns.json')
-    return '{} of {}'.format(random.choice(titles).capitalize(), random.choice(nouns).capitalize())
+    title = '{} of {}'.format(random.choice(titles).capitalize(), random.choice(nouns).capitalize())
+    if gemini_model:
+        responsibilities = generate_content(gemini_model, title_responsibilities_prompt(title))
+        # The responsibilities usually includes the title
+        return f'<div class="card-title pricing-card-title">{responsibilities}</div>'
+    else:
+        return title
 
 @app.route('/api/v1/title2')
 def api_generate_title_2():
@@ -76,20 +87,6 @@ def shuffle_list():
 @app.route('/')
 def index():
     return render_template('index.html')
-
-@app.route('/submit_scenarios', methods=['POST'])
-def submit_scenarios():
-    responses = {}
-    for key, value in request.form.items():
-        if key.startswith('response_'):
-            scenario_index = key.split('_')[1]
-            scenario_text = request.form.get(f'scenario_{scenario_index}')
-            responses[scenario_text] = value
-
-    # Process the responses as needed
-    # For example, generate a title based on the responses
-    title = model.generate_title(responses)
-    return jsonify({'title': title})
 
 @app.route('/scenario', methods=['GET'])
 def scenario():
@@ -140,31 +137,40 @@ if __name__ == '__main__':
                         help='a file with a json list of nouns')
     parser.add_argument('-t', '--titles', default="titles.json",
                         help='a file with a json list of titles')
+    parser.add_argument('-s', '--scenarios', action='store_true',
+                        help='generate scenarios with ollama. Set model with '
+                             'environment variable OLLAMA_MODEL')
+
 
     args = parser.parse_args()
 
     main_nouns = load_args(args.nouns)
     main_titles = load_args(args.titles)
 
-    service_manager = start_ollama()
-    atexit.register(service_manager.stop_service)
+    if args.scenarios:
+        service_manager = start_ollama()
+        atexit.register(service_manager.stop_service)
+        pull_model()
 
-    pull_model()
+        # Set the socket timeout
+        socket.setdefaulttimeout(600)
+        # Start the background thread to fill the scenario queue
+        threading.Thread(target=fill_scenario_queue, daemon=True).start()
 
-    # Set the socket timeout
-    socket.setdefaulttimeout(600)
-    # Start the background thread to fill the scenario queue
-    threading.Thread(target=fill_scenario_queue, daemon=True).start()
+        scenario_queue.put([
+            {
+                "text": "You find a mysterious book in an old library. What do you do?",
+                "choices": ["Read it", "Ignore it", "Take it home"]
+            },
+            {
+                "text": "You encounter a dragon. What do you do?",
+                "choices": ["Fight it", "Run away", "Befriend it"]
+            }
+        ])
 
-    scenario_queue.put([
-        {
-            "text": "You find a mysterious book in an old library. What do you do?",
-            "choices": ["Read it", "Ignore it", "Take it home"]
-        },
-        {
-            "text": "You encounter a dragon. What do you do?",
-            "choices": ["Fight it", "Run away", "Befriend it"]
-        }
-    ])
+    if os.environ["GEMINI_API_KEY"]:
+        configure_gemini()
+        gemini_model = create_gemini_model()
+
 
     app.run(host='0.0.0.0')
