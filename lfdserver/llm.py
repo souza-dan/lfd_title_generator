@@ -4,7 +4,7 @@ import subprocess
 import time
 import requests
 import logging
-import re
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ def pull_model():
     ollama.pull(get_model())
 
 def get_model():
-    return 'gemma:1b'
+    return os.getenv('OLLAMA_MODEL', 'gemma')
 
 
 def generate_scenario():
