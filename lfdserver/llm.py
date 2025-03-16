@@ -133,7 +133,7 @@ def title_responsibilities_prompt(title):
     <h5>,<strong> tags as needed.
     
     Please end the response with a humorous disclaimer. Avoid phrases
-    such as "The above roles and responsibilities are intended for comedic purposes only."
+    such as "The above roles and responsibilities are intended for comedic purposes only." and "Humorous Disclaimer"
     
     Only provide the responsibilities HTML content. Do not wrap it in any text commentary.
     '''
@@ -141,7 +141,7 @@ def title_responsibilities_prompt(title):
 def configure_gemini():
     genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
-def create_gemini_model(model='gemini-2.0-flash'):
+def create_gemini_model(model='gemini-2.0-flash-001'):
     return genai.GenerativeModel(model)
 
 def generate_content(model, prompt):
