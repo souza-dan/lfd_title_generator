@@ -125,19 +125,24 @@ class OllamaServiceManager:
 
 def title_responsibilities_prompt(title):
     return f'''
-    Please provide the roles and responsibilities for the position: "{title}".
+    Please provide the role description, responsibilities, skills for the position: "{title}".
     
-    The position is somewhat absurd, so feel free to be creative and whimsical with the roles 
-    and responsibilities.
-    Please provide the responsibilities HTML content. Use <p>, <ul>, <li>, <h2>, <h3>, <h4>, 
+    The position is food related and intentionally absurd, so be creative, outlandish, 
+    satirical, and whimsical with the roles and responsibilities.
+    Please provide the responsibilities as HTML content. Use <p>, <ul>, <li>, <h2>, <h3>, <h4>, 
     <h5>,<strong> tags as needed.
+    
+    Please end the response with a humorous disclaimer. Avoid phrases
+    such as "The above roles and responsibilities are intended for comedic purposes only."
+    
+    Only provide the responsibilities HTML content. Do not wrap it in any text commentary.
     '''
 
 def configure_gemini():
     genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
-def create_gemini_model():
-    return genai.GenerativeModel('gemini-1.5-flash')
+def create_gemini_model(model='gemini-2.0-flash'):
+    return genai.GenerativeModel(model)
 
 def generate_content(model, prompt):
     response = model.generate_content(prompt)

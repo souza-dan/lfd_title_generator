@@ -55,8 +55,13 @@ def api_generate_title():
     title = '{} of {}'.format(random.choice(titles).capitalize(), random.choice(nouns).capitalize())
     if gemini_model:
         responsibilities = generate_content(gemini_model, title_responsibilities_prompt(title))
+        # Sometimes, gemini will wrap the response in "```html"
+        if "```html" in responsibilities:
+            responsibilities = responsibilities.replace("```html", "")
+            responsibilities = responsibilities.replace("```", "")
         # The responsibilities usually includes the title
-        return f'<div class="card-title pricing-card-title">{responsibilities}</div>'
+        return (f'<h1 class="card-title pricing-card-title">{title}</h1>'
+                f'<div class="card-title pricing-card-body text-left">{responsibilities}</div>')
     else:
         return title
 
@@ -168,9 +173,12 @@ if __name__ == '__main__':
             }
         ])
 
-    if os.environ["GEMINI_API_KEY"]:
+    if os.environ.get("GEMINI_API_KEY"):
         configure_gemini()
-        gemini_model = create_gemini_model()
+        if os.environ.get("GEMINI_MODEL"):
+            gemini_model = create_gemini_model(model=os.environ["GEMINI_MODEL"])
+        else:
+            gemini_model = create_gemini_model()
 
 
     app.run(host='0.0.0.0')
