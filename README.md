@@ -97,7 +97,9 @@ You can specify different files using the `-t` and `-n` command-line arguments w
 
 To enable scenario generation, use the -s flag when starting the server. Ensure the OLLAMA_MODEL environment variable is set to the desired model.
 
-To enable gemini role descriptions, set `GEMINI_API_KEY`. The model is configurable with `GEMINI_MODEL` (e.g. `gemini-2.0-flash-lite`).
+To enable Gemini role descriptions, set `GEMINI_API_KEY`. The model is configurable with `GEMINI_MODEL` (e.g. `gemini-2.0-flash-lite`). Default model is `gemini-2.0-flash`.
+
+See the [Gemini Models](https://ai.google.dev/gemini-api/docs/models) page for all the available Gemini models.
 
 ## License
 

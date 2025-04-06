@@ -141,7 +141,7 @@ def title_responsibilities_prompt(title):
 def configure_gemini():
     genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
-def create_gemini_model(model='gemini-2.0-flash-001'):
+def create_gemini_model(model='gemini-2.0-flash'):
     return genai.GenerativeModel(model)
 
 def generate_content(model, prompt):
