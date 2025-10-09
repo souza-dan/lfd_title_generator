@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Storybook</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #image-container img { max-width: 80vw; max-height: 70vh; }
+        #nav-btns { margin: 20px; }
+        #question-section { margin: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Story Time</h1>
+    <div id="book-tabs" style="margin: 20px;"></div>
+    <div id="image-container"></div>
+    <div id="nav-btns">
+        <button id="prev-btn">Previous</button>
+        <button id="next-btn">Next</button>
+    </div>
+    <div id="question-section" style="display:none;">
+        <p id="question-text"></p>
+        <input type="text" id="answer-input" />
+        <button id="submit-answer">Submit</button>
+        <p id="feedback" style="color:red;"></p>
+    </div>
+    <script>
+        // Book image lists
+        const books = [
+            [
+                'assets/book1/red_chef_00.png',
+                'assets/book1/red_chef_01.png',
+                'assets/book1/red_chef_02.png',
+                'assets/book1/red_chef_03.png',
+                'assets/book1/red_chef_04.png',
+                'assets/book1/red_chef_05.png',
+                'assets/book1/red_chef_06.png',
+                'assets/book1/red_chef_07_recipe.png'
+            ],
+            [
+                'assets/book2/red_chef_00.png',
+                'assets/book2/red_chef_01.png',
+                'assets/book2/red_chef_02.png',
+                'assets/book2/red_chef_03.png',
+                'assets/book2/red_chef_04_maze.png',
+                'assets/book2/red_chef_05_recipe.png',
+                'assets/book2/red_chef_06_ciphers.png',
+                'assets/book2/red_chef_07_letter.png'
+            ],
+            [
+                'assets/book3/red_chef_00.png',
+                'assets/book3/red_chef_01.png',
+                'assets/book3/red_chef_02.png',
+                'assets/book3/red_chef_03.png'
+            ]
+        ];
+        const questions = [
+            {
+                text: 'To read the original manuscript, what was the author trying to tell us?',
+                answer: 'theychangedit'
+            },
+            {
+                text: 'To read the ending, what is the author\'s secret message?',
+                answer: 'lou'
+            }
+        ];
+        let currentBook = 0;
+        let currentPage = 0;
+        let unlockedBooks = [true, false, false];
+        // Load progress from localStorage
+        if (localStorage.getItem('unlockedBooks')) {
+            unlockedBooks = JSON.parse(localStorage.getItem('unlockedBooks'));
+        }
+        function renderTabs() {
+            const tabContainer = document.getElementById('book-tabs');
+            tabContainer.innerHTML = '';
+            books.forEach((_, idx) => {
+                const tab = document.createElement('button');
+                tab.textContent = `Book ${idx + 1}`;
+                tab.style.marginRight = '8px';
+                tab.disabled = !unlockedBooks[idx];
+                if (idx === currentBook) {
+                    tab.style.fontWeight = 'bold';
+                    tab.style.textDecoration = 'underline';
+                }
+                tab.onclick = function() {
+                    if (unlockedBooks[idx]) {
+                        currentBook = idx;
+                        currentPage = 0;
+                        showImage();
+                        renderTabs();
+                        hideQuestion();
+                    }
+                };
+                tabContainer.appendChild(tab);
+            });
+        }
+        function showImage() {
+            const imgSrc = books[currentBook][currentPage];
+            document.getElementById('image-container').innerHTML = `<img src="${imgSrc}" alt="Story page">`;
+            document.getElementById('prev-btn').disabled = currentPage === 0;
+            document.getElementById('next-btn').disabled = false;
+            renderTabs();
+        }
+        function showQuestion() {
+            document.getElementById('question-section').style.display = 'block';
+            document.getElementById('question-text').textContent = questions[currentBook].text;
+            document.getElementById('feedback').textContent = '';
+        }
+        function hideQuestion() {
+            document.getElementById('question-section').style.display = 'none';
+        }
+        document.getElementById('prev-btn').onclick = function() {
+            if (currentPage > 0) {
+                currentPage--;
+                showImage();
+            }
+        };
+        document.getElementById('next-btn').onclick = function() {
+            if (currentPage < books[currentBook].length - 1) {
+                currentPage++;
+                showImage();
+            } else {
+                // End of book, check if next book is unlocked
+                if (currentBook < books.length - 1 && !unlockedBooks[currentBook + 1]) {
+                    showQuestion();
+                } else if (currentBook < books.length - 1 && unlockedBooks[currentBook + 1]) {
+                    currentBook++;
+                    currentPage = 0;
+                    showImage();
+                }
+            }
+        };
+        document.getElementById('submit-answer').onclick = function() {
+            const userAnswer = document.getElementById('answer-input').value.replace(/\s+/g, '').toLowerCase();
+            if (userAnswer === questions[currentBook].answer) {
+                unlockedBooks[currentBook + 1] = true;
+                localStorage.setItem('unlockedBooks', JSON.stringify(unlockedBooks));
+                hideQuestion();
+                currentBook++;
+                currentPage = 0;
+                showImage();
+                renderTabs();
+            } else {
+                document.getElementById('feedback').textContent = 'Incorrect. Try again.';
+            }
+        };
+        // Initial display
+        showImage();
+        renderTabs();
+    </script>
+</body>
+</html>

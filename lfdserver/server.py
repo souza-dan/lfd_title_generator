@@ -1,7 +1,7 @@
 import os
 
 import ollama
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 
 import argparse
 import json
@@ -122,6 +122,17 @@ def submit_response():
     log.info(f"Evaluated Response: {response}")
 
     return jsonify({'title': response['response']})
+
+
+@app.route('/storybook')
+def storybook():
+    return send_from_directory(os.path.dirname(__file__), 'storybook.html')
+
+
+@app.route('/assets/<path:filename>')
+def serve_assets(filename):
+    assets_dir = os.path.join(os.path.dirname(__file__), 'assets')
+    return send_from_directory(assets_dir, filename)
 
 
 def load_args(json_file):
