@@ -101,6 +101,12 @@
             document.getElementById('prev-btn').disabled = currentPage === 0;
             document.getElementById('next-btn').disabled = false;
             renderTabs();
+            // Preload next image if available
+            if (currentPage < books[currentBook].length - 1) {
+                const nextImgSrc = books[currentBook][currentPage + 1];
+                const preloadImg = new Image();
+                preloadImg.src = nextImgSrc;
+            }
         }
         function showQuestion() {
             document.getElementById('question-section').style.display = 'block';
