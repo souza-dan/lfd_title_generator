@@ -20,6 +20,7 @@
     </div>
     <div id="question-section" style="display:none;">
         <p id="question-text"></p>
+        <p id="answer-hint" style="font-size:1.2em; letter-spacing:0.5em;"></p>
         <input type="text" id="answer-input" />
         <button id="submit-answer">Submit</button>
         <p id="feedback" style="color:red;"></p>
@@ -56,12 +57,14 @@
         ];
         const questions = [
             {
-                text: 'To read the original manuscript, what was the author trying to tell us?',
-                answer: 'theychangedit'
+                text: 'To read the original manuscript, what did the author add to the recipe to make it so suspiciously good?',
+                answer: 'theychangedit',
+                hint: '____ _______ __'
             },
             {
-                text: 'To read the ending, who is the author keeping safe?',
-                answer: 'lou'
+                text: 'To read the ending, what or who is the author keeping safe?',
+                answer: 'lou',
+                hint: '___'
             }
         ];
         let currentBook = 0;
@@ -112,6 +115,17 @@
             document.getElementById('question-section').style.display = 'block';
             document.getElementById('question-text').textContent = questions[currentBook].text;
             document.getElementById('feedback').textContent = '';
+            // Show hint with newlines for each word
+            let hintElem = document.getElementById('answer-hint');
+            if (!hintElem) {
+                hintElem = document.createElement('p');
+                hintElem.id = 'answer-hint';
+                hintElem.style.fontSize = '1.2em';
+                hintElem.style.letterSpacing = '0.5em';
+                document.getElementById('question-section').insertBefore(hintElem, document.getElementById('answer-input'));
+            }
+            const hintWords = questions[currentBook].hint.split(' ');
+            hintElem.innerHTML = hintWords.join('<br>');
         }
         function hideQuestion() {
             document.getElementById('question-section').style.display = 'none';
