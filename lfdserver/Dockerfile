@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3.9-slim
+FROM python:3.13-slim
 
 # Set the working directory in the container
 WORKDIR /app
@@ -10,7 +10,7 @@ COPY . /app
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt && \
     apt-get update && \
-    apt-get install -y curl && \
+    apt-get install -y curl zstd && \
     apt-get clean && \
     curl -fsSL https://ollama.com/install.sh | sh
 
