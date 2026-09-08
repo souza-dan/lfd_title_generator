@@ -185,11 +185,12 @@ if __name__ == '__main__':
         ])
 
     if os.environ.get("GEMINI_API_KEY"):
-        configure_gemini()
+        log.info(f"GEMINI_API_KEY=: {os.environ.get('GEMINI_API_KEY')[:4]}")
+        client = configure_gemini()
         if os.environ.get("GEMINI_MODEL"):
-            gemini_model = create_gemini_model(model=os.environ["GEMINI_MODEL"])
+            gemini_model = create_gemini_model(model=os.environ["GEMINI_MODEL"], client=client)
         else:
-            gemini_model = create_gemini_model()
+            gemini_model = create_gemini_model(client=client)
 
 
     app.run(host='0.0.0.0')

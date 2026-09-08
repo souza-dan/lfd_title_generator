@@ -5,7 +5,7 @@ import time
 import requests
 import logging
 import os
-import google.generativeai as genai
+from google import genai
 
 logger = logging.getLogger(__name__)
 
@@ -138,13 +138,29 @@ def title_responsibilities_prompt(title):
     Only provide the responsibilities HTML content. Do not wrap it in any text commentary.
     '''
 
-def configure_gemini():
-    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+def configure_gemini(api_key=None):
+    if api_key is None:
+        api_key = os.environ.get("GEMINI_API_KEY")
+    return genai.Client(api_key=api_key)
 
-def create_gemini_model(model='gemini-2.0-flash'):
-    return genai.GenerativeModel(model)
+def create_gemini_client(api_key=None):
+    return configure_gemini(api_key=api_key)
 
-def generate_content(model, prompt):
-    response = model.generate_content(prompt)
+def create_gemini_model(model='gemini-2.0-flash', client=None):
+    if client is None:
+        client = configure_gemini()
+    return client, model
+
+def generate_content(client_or_model, prompt, model=None):
+    if isinstance(client_or_model, tuple):
+        client, m = client_or_model
+        model = model or m
+    else:
+        client = client_or_model
+        model = model or os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+    response = client.models.generate_content(
+        model=model,
+        contents=prompt,
+    )
     logging.info(f"Generated content: {response}")
     return response.text
